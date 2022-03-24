@@ -1,0 +1,267 @@
+openapi: 3.0.1
+info:
+  title: Tier calculator application
+  version: v1
+servers:
+  - url: http://localhost:8080
+    description: Local development
+paths:
+  /order:
+    post:
+      description: Reports an order to the application. If the given customer does not exist, it will be created within the application.
+      tags:
+        - Order
+      operationId: reportOrder
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderReport'
+        required: true
+      responses:
+        "200":
+          $ref: '#/components/responses/Success'
+        '400':
+          $ref: '#/components/responses/BadArgument'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/OrderReportScopeRequired'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+  /admin/create-customer:
+    post:
+      description: Creates a customer within the application. Each client is assigned a unique ID in an UUID format and a random name. This endpoint should be used for testing purposes only.
+      tags:
+        - Admin
+      operationId: createCustomer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          description: Client cannot perform this operation (admin scope is required)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfErrors'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+  /customer:
+    get:
+      description: Lists all customers registered in the application. This endpoint is paginated. Please refer to the schema for pagination defaults.
+      tags:
+        - Customer
+      operationId: getCustomers
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 100
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Customer'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/CustomerReadScopeRequired'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+  /customer/{id}/orders:
+    get:
+      description: Lists the customer's orders, starting from the newest one. This endpoint is paginated. Please refer to the schema for pagination defaults.
+      tags:
+        - Customer
+      operationId: getCustomerOrders
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 100
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderInfo'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/CustomerReadScopeRequired'
+        '404':
+          $ref: '#/components/responses/CustomerNotFound'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+  /customer/{id}/info:
+    get:
+      description: Calculates the information about the customer, including current tier and amount of money needed to be spent to reach next tier. The tiers in this API are just numbers (starting from 0) that are configurable in the applicaation and there is no mapping between the tier number and its name.
+      tags:
+        - Customer
+      operationId: getCustomerInfo
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerInfo'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/CustomerReadScopeRequired'
+        '404':
+          $ref: '#/components/responses/CustomerNotFound'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    Success:
+      description: The operation is successful
+    BadArgument:
+      description: The argument is invalid (see Schemas for limitations)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ArrayOfErrors'
+    InternalServerError:
+      description: Internal server error. The server was not able to complete the request.
+    CustomerNotFound:
+      description: A customer with the specified ID does not exist.
+    OrderReportScopeRequired:
+      description: Client cannot perform this operation (order:report scope is required)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ArrayOfErrors'
+    CustomerReadScopeRequired:
+      description: Client cannot perform this operation (customer:reada scope is required)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ArrayOfErrors'
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    ArrayOfErrors:
+      type: array
+      items:
+        type: string
+      example: [ "Explanation why the request failed" ]
+    OrderReport:
+      required:
+        - customerId
+        - customerName
+        - orderId
+      type: object
+      properties:
+        orderId:
+          type: string
+        customerId:
+          type: string
+        customerName:
+          maxLength: 255
+          minLength: 3
+          type: string
+        totalInCents:
+          type: integer
+          format: int32
+        date:
+          type: string
+          format: date-time
+    Customer:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          maxLength: 255
+          minLength: 3
+          type: string
+    OrderInfo:
+      type: object
+      properties:
+        orderId:
+          type: string
+        totalInCents:
+          type: integer
+          format: int32
+        date:
+          type: string
+          format: date-time
+    CustomerInfo:
+      type: object
+      properties:
+        currentTier:
+          type: integer
+          format: int32
+        tierStartDate:
+          type: string
+          format: date-time
+        totalSpent:
+          type: integer
+          format: int32
+        toSpendToReachNextTier:
+          type: integer
+          format: int32
+        downgradeTier:
+          type: integer
+          format: int32
+        downgradeDate:
+          type: string
+          format: date-time
+        toSpendToAvoidDowngrade:
+          type: integer
+          format: int32
+security:
+  - bearerAuth: [ ]

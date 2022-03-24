@@ -1,0 +1,8 @@
+server:
+  port: 6784
+customer:
+  auto-create: false
+
+#logging:
+#  level:
+#    root: DEBUG
