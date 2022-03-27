@@ -1,10 +1,10 @@
-import {Fragment} from 'react';
-import {CustomerInfo} from "../model/CustomerInfo";
-import Tier from "./Tier";
+import {CustomerInfo} from "../../model/CustomerInfo";
+import Tier from "./Tier/Tier";
 
 const CustomerList = (props: { customerInfo: CustomerInfo }) => {
   return (
-      <Fragment>
+      <>
+        <h1>{props.customerInfo.customerName}</h1>
         <p>
           Customer current
           tier: <Tier tier={props.customerInfo.currentTier}/> {props.customerInfo.downgradeTier &&
@@ -18,9 +18,9 @@ const CustomerList = (props: { customerInfo: CustomerInfo }) => {
           ${props.customerInfo.totalSpent / 100}.
           {props.customerInfo.toSpendToReachNextTier > 0 && (
               <div>To reach <Tier tier={props.customerInfo.currentTier + 1}/>, the customer needs to
-                spend ${props.customerInfo.toSpendToReachNextTier / 100}</div>)}
+                spend ${props.customerInfo.toSpendToReachNextTier / 100} more.</div>)}
         </p>
-      </Fragment>
+      </>
   );
 };
 

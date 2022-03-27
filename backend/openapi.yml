@@ -79,9 +79,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Customer'
+                $ref: '#/components/schemas/GetCustomersResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -120,9 +118,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/OrderInfo'
+                $ref: '#/components/schemas/GetOrdersResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -198,6 +194,26 @@ components:
       items:
         type: string
       example: [ "Explanation why the request failed" ]
+    GetCustomersResponse:
+      type: object
+      properties:
+        customers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Customer'
+        allCustomersCount:
+          type: integer
+          format: int32
+    GetOrdersResponse:
+      type: object
+      properties:
+        orders:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderInfo'
+        allOrdersCount:
+          type: integer
+          format: int32
     OrderReport:
       required:
         - customerId
@@ -242,6 +258,8 @@ components:
     CustomerInfo:
       type: object
       properties:
+        customerName:
+          type: string
         currentTier:
           type: integer
           format: int32

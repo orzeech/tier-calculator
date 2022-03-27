@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.PageRequest;
 import pl.orzechsoft.tiercalculator.model.customer.Customer;
 import pl.orzechsoft.tiercalculator.model.customer.CustomerInfo;
+import pl.orzechsoft.tiercalculator.model.customer.GetCustomersResponse;
 import pl.orzechsoft.tiercalculator.model.exception.CustomerDoesNotExistException;
 import pl.orzechsoft.tiercalculator.repository.CustomerRepository;
 import pl.orzechsoft.tiercalculator.repository.OrderRepository;
@@ -59,11 +60,13 @@ class CustomerServiceTest {
         Faker.instance().name().fullName());
     int page = 0;
     int pageSize = 5;
+    List<Customer> customers = List.of(customer1, customer2, customer3);
     when(clientRepository.findAll(PageRequest.of(page, pageSize))).thenReturn(
-        List.of(customer1, customer2, customer3));
+        customers);
+    when(clientRepository.count()).thenReturn((long) customers.size());
 
     StepVerifier.create(service.getAllCustomers(page, pageSize))
-        .expectNext(customer1, customer2, customer3)
+        .expectNext(new GetCustomersResponse(customers, 3))
         .verifyComplete();
   }
 
@@ -123,7 +126,8 @@ class CustomerServiceTest {
         ZoneId.systemDefault());
     ZonedDateTime endOfThisYear = ZonedDateTime.of(currentYear, 12, 30, 23, 59, 59, 0,
         ZoneId.systemDefault());
-    Customer customer = new Customer(customerId, Faker.instance().name().fullName());
+    String customerName = Faker.instance().name().fullName();
+    Customer customer = new Customer(customerId, customerName);
 
     when(clientRepository.findById(customerId)).thenReturn(Optional.of(customer));
     int sumForCurrentYear = 3000;
@@ -134,7 +138,7 @@ class CustomerServiceTest {
     service.tierValues = new int[]{2000, 10000, 15000};
     service.timezone = ZoneId.systemDefault().getId();
 
-    CustomerInfo customerInfo = new CustomerInfo(3, beginningOfLastYear,
+    CustomerInfo customerInfo = new CustomerInfo(customerName, 3, beginningOfLastYear,
         sumForLastYear + sumForCurrentYear, 0, 1,
         endOfThisYear, service.tierValues[2] - sumForCurrentYear);
 
@@ -153,7 +157,8 @@ class CustomerServiceTest {
         ZoneId.systemDefault());
     ZonedDateTime endOfThisYear = ZonedDateTime.of(currentYear, 12, 30, 23, 59, 59, 0,
         ZoneId.systemDefault());
-    Customer customer = new Customer(customerId, Faker.instance().name().fullName());
+    String customerName = Faker.instance().name().fullName();
+    Customer customer = new Customer(customerId, customerName);
 
     when(clientRepository.findById(customerId)).thenReturn(Optional.of(customer));
     int sumForCurrentYear = 15300;
@@ -164,7 +169,7 @@ class CustomerServiceTest {
     service.tierValues = new int[]{2000, 10000, 15000};
     service.timezone = ZoneId.systemDefault().getId();
 
-    CustomerInfo customerInfo = new CustomerInfo(3, beginningOfLastYear,
+    CustomerInfo customerInfo = new CustomerInfo(customerName, 3, beginningOfLastYear,
         sumForLastYear + sumForCurrentYear, 0, null,
         endOfThisYear, 0);
 
@@ -183,7 +188,8 @@ class CustomerServiceTest {
         ZoneId.systemDefault());
     ZonedDateTime endOfThisYear = ZonedDateTime.of(currentYear, 12, 30, 23, 59, 59, 0,
         ZoneId.systemDefault());
-    Customer customer = new Customer(customerId, Faker.instance().name().fullName());
+    String customerName = Faker.instance().name().fullName();
+    Customer customer = new Customer(customerId, customerName);
 
     when(clientRepository.findById(customerId)).thenReturn(Optional.of(customer));
     int sumForCurrentYear = 0;
@@ -194,7 +200,7 @@ class CustomerServiceTest {
     service.tierValues = new int[]{2000, 10000, 15000};
     service.timezone = ZoneId.systemDefault().getId();
 
-    CustomerInfo customerInfo = new CustomerInfo(0, beginningOfLastYear,
+    CustomerInfo customerInfo = new CustomerInfo(customerName, 0, beginningOfLastYear,
         0, 2000, null,
         endOfThisYear, 0);
 

@@ -17,7 +17,9 @@ There are no extra libraries being used at this moment.
 # TODO
 
 - **Styling** - The styling is very basic right now
-- **Tables with pagination** - Although the backend supports
-- **Breaking down some components / elements** - They have too much responsibility
+- ~~**Tables with pagination** - Although the backend supports~~
+- ~~**Breaking down some components / elements** - They have too much responsibility~~
 - **Tests** - The application needs solid tests
 - **Login / security** - The token is hardcoded
+- **Manual Order report** - Make it easier to report orders
+- **Refresh button for tables**

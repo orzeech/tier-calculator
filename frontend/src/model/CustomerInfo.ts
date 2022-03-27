@@ -1,4 +1,5 @@
 export interface CustomerInfo {
+  customerName: string;
   currentTier: number
   tierStartDate: Date;
   totalSpent: number;

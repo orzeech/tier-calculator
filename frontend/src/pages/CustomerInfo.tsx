@@ -2,8 +2,8 @@ import React, {useEffect} from "react";
 import {match, useRouteMatch} from "react-router-dom";
 import useHttp from "../hooks/use-http";
 import {getCustomerInfo} from "../lib/api";
-import LoadingSpinner from "../components/LoadingSpinner";
-import CustomerInfoPanel from "../components/CustomerInfoPanel";
+import LoadingSpinner from "../components/LoadingSpinner/LoadingSpinner";
+import CustomerInfoPanel from "../components/CustomerInfoPanel/CustomerInfoPanel";
 
 const CustomerInfo = () => {
   const customMatch: match<{ customerId: string }> | null = useRouteMatch('/customers/:customerId/info')

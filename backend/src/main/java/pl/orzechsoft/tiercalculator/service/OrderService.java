@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import pl.orzechsoft.tiercalculator.model.customer.Customer;
+import pl.orzechsoft.tiercalculator.model.order.GetOrdersResponse;
 import pl.orzechsoft.tiercalculator.model.order.OrderEntity;
 import pl.orzechsoft.tiercalculator.model.order.OrderInfo;
 import pl.orzechsoft.tiercalculator.model.order.OrderReport;
@@ -27,10 +28,14 @@ public class OrderService {
                 customer)))).then();
   }
 
-  public Flux<OrderInfo> listOrders(Customer customer, int page, int pageSize) {
+  public Mono<GetOrdersResponse> listOrders(Customer customer, int page, int pageSize) {
     return Flux.fromIterable(orderRepository.findAllByCustomerOrderByDate(customer,
             PageRequest.of(page, pageSize)))
         .map(orderEntity -> new OrderInfo(orderEntity.getOrderId(),
-            orderEntity.getTotalInCents(), orderEntity.getDate()));
+            orderEntity.getTotalInCents(), orderEntity.getDate()))
+        .collectList()
+        .zipWith(Mono.just(orderRepository.countAllByCustomer(customer)))
+        .map(ordersAndCount -> new GetOrdersResponse(ordersAndCount.getT1(),
+            Math.toIntExact(ordersAndCount.getT2())));
   }
 }

@@ -10,10 +10,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import pl.orzechsoft.tiercalculator.model.customer.Customer;
 import pl.orzechsoft.tiercalculator.model.customer.CustomerInfo;
+import pl.orzechsoft.tiercalculator.model.customer.GetCustomersResponse;
 import pl.orzechsoft.tiercalculator.model.exception.CustomerDoesNotExistException;
 import pl.orzechsoft.tiercalculator.repository.CustomerRepository;
 import pl.orzechsoft.tiercalculator.repository.OrderRepository;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -38,8 +38,14 @@ public class CustomerService {
         new Customer(UUID.randomUUID().toString(), Faker.instance().name().fullName())));
   }
 
-  public Flux<Customer> getAllCustomers(int page, int size) {
-    return Flux.fromIterable(customerRepository.findAll(PageRequest.of(page, size)));
+  public Mono<GetCustomersResponse> getAllCustomers(int page, int size) {
+    return Mono.just(customerRepository.findAll(PageRequest.of(page, size)))
+        .zipWith(Mono.just(customerRepository.count()))
+        .map(customersAndCount -> {
+          System.out.println(customersAndCount);
+          return new GetCustomersResponse(customersAndCount.getT1(),
+              Math.toIntExact(customersAndCount.getT2()));
+        });
   }
 
   public Mono<Customer> getCustomer(String id) {
@@ -73,7 +79,9 @@ public class CustomerService {
     ZonedDateTime endOfThisYear = ZonedDateTime.of(currentYear, 12, 30, 23, 59, 59, 0,
         serverTimezone);
     Integer downgradeTier = calculateDowngradeTier(sumForCurrentYear, currentTier);
-    return new CustomerInfo(currentTier, beginningOfLastYear,
+    return new CustomerInfo(customer.getName(),
+        currentTier,
+        beginningOfLastYear,
         totalSum,
         calculateAmountToSpend(currentTier + 1, totalSum),
         downgradeTier,

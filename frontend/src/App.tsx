@@ -2,7 +2,7 @@ import React from 'react';
 import './App.css';
 import Customers from "./pages/Customers";
 import {Redirect, Route, Switch} from "react-router-dom";
-import MainHeader from "./components/MainHeader";
+import MainHeader from "./components/MainHeader/MainHeader";
 import Orders from "./pages/Orders";
 import NotFound from "./pages/NotFound";
 import CustomerInfo from "./pages/CustomerInfo";

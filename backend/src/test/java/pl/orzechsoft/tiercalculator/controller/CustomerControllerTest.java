@@ -26,12 +26,13 @@ import pl.orzechsoft.tiercalculator.config.SecurityConfig;
 import pl.orzechsoft.tiercalculator.config.ValidationConfig;
 import pl.orzechsoft.tiercalculator.model.customer.Customer;
 import pl.orzechsoft.tiercalculator.model.customer.CustomerInfo;
+import pl.orzechsoft.tiercalculator.model.customer.GetCustomersResponse;
 import pl.orzechsoft.tiercalculator.model.exception.CustomerDoesNotExistException;
+import pl.orzechsoft.tiercalculator.model.order.GetOrdersResponse;
 import pl.orzechsoft.tiercalculator.model.order.OrderInfo;
 import pl.orzechsoft.tiercalculator.service.ClientMessageService;
 import pl.orzechsoft.tiercalculator.service.CustomerService;
 import pl.orzechsoft.tiercalculator.service.OrderService;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @WebFluxTest(CustomerController.class)
@@ -76,8 +77,10 @@ class CustomerControllerTest {
     String customer2Id = UUID.randomUUID().toString();
     Customer customer2 = new Customer(customer2Id,
         Faker.instance().name().fullName());
-    when(customerService.getAllCustomers(anyInt(), anyInt())).thenReturn(Flux.fromIterable(
-        List.of(customer, customer2)));
+    GetCustomersResponse response = new GetCustomersResponse(
+        List.of(customer, customer2), 2);
+    when(customerService.getAllCustomers(anyInt(), anyInt())).thenReturn(
+        Mono.just(response));
 
     webTestClient
         .mutateWith(mockJwt().jwt(jwt -> jwt.claim("scope", "customer:read")))
@@ -86,8 +89,8 @@ class CustomerControllerTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBodyList(Customer.class)
-        .contains(customer, customer2);
+        .expectBody(GetCustomersResponse.class)
+        .equals(response);
 
     verify(customerService, times(1)).getAllCustomers(eq(0), anyInt());
   }
@@ -96,7 +99,8 @@ class CustomerControllerTest {
   @DisplayName("Should get customer info")
   void shouldGetCustomerInfo() {
     String customerId = UUID.randomUUID().toString();
-    CustomerInfo customerInfo = new CustomerInfo(0, ZonedDateTime.now(ZoneId.of(timezone)),
+    CustomerInfo customerInfo = new CustomerInfo("Janusz Kowal", 0,
+        ZonedDateTime.now(ZoneId.of(timezone)),
         12345, 222, null,
         ZonedDateTime.now(ZoneId.of(timezone)), 0);
     when(customerService.getCustomerInfo(customerId)).thenReturn(Mono.just(
@@ -123,8 +127,9 @@ class CustomerControllerTest {
         Faker.instance().name().fullName());
     OrderInfo order1 = new OrderInfo("orderid1", 123452, ZonedDateTime.now(ZoneId.of(timezone)));
     OrderInfo order2 = new OrderInfo("orderid2", 1232, ZonedDateTime.now(ZoneId.of(timezone)));
+    GetOrdersResponse response = new GetOrdersResponse(List.of(order1, order2), 2);
     when(orderService.listOrders(eq(customer), eq(0), anyInt())).thenReturn(
-        Flux.just(order1, order2));
+        Mono.just(response));
     when(customerService.getCustomer(customerId)).thenReturn(Mono.just(customer));
 
     webTestClient
@@ -134,8 +139,8 @@ class CustomerControllerTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBodyList(OrderInfo.class)
-        .contains(order1, order2);
+        .expectBody(GetOrdersResponse.class)
+        .isEqualTo(response);
 
     verify(orderService, times(1)).listOrders(eq(customer), eq(0), anyInt());
   }

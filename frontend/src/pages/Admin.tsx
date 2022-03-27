@@ -1,5 +1,5 @@
 import React from "react";
-import CreateCustomer from "../components/CreateCustomer";
+import CreateCustomer from "../components/CreateCustomer/CreateCustomer";
 
 const Admin = () => {
   return <div><CreateCustomer/></div>

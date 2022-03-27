@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CustomerInfo {
 
+  private String customerName;
   private int currentTier;
   private ZonedDateTime tierStartDate;
   private int totalSpent;

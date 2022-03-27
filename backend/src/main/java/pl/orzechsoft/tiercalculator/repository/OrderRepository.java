@@ -11,6 +11,8 @@ public interface OrderRepository extends CrudRepository<OrderEntity, String> {
 
   List<OrderEntity> findAllByCustomerOrderByDate(Customer customer, Pageable pageable);
 
+  long countAllByCustomer(Customer customer);
+
   //Returns null if there were no orders in a given year
   @Query("SELECT sum(totalInCents) FROM OrderEntity WHERE customer = ?1 AND year(date) = ?2")
   Integer sumOrderTotalsForYear(Customer customer, int year);

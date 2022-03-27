@@ -1,6 +1,6 @@
-import useHttp from "../hooks/use-http";
-import {createRandomCustomer} from "../lib/api";
-import LoadingSpinner from "./LoadingSpinner";
+import useHttp from "../../hooks/use-http";
+import {createRandomCustomer} from "../../lib/api";
+import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
 import React from "react";
 
 const CreateCustomer = () => {
