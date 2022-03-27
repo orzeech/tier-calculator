@@ -1,0 +1,29 @@
+.from {
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+.to {
+  margin-left: 10px;
+  font-weight: bold;
+}
+
+.container {
+  height: 20px;
+  width: 150px;
+  background-color: #e0e0de;
+  border-radius: 20px;
+  display: inline-block;
+}
+
+.filler {
+  height: 100%;
+  background-color: #3986ef;
+  border-radius: inherit;
+  text-align: right;
+}
+
+.label {
+  padding: 5px;
+  color: black;
+}

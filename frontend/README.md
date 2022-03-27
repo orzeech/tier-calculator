@@ -14,6 +14,12 @@ This is a very simple React app with React Router routers. The main routes are s
 The components are using the hook defined in `use-http.ts` and the API methods defined in `api.ts`.
 There are no extra libraries being used at this moment.
 
+# Tier configuration
+
+Tiers are configured in [tiers.json](src/config/tiers.json) file. By modifying this file, you can
+change the display of the given tier. Please make sure that the `from` and `to` values are
+consistent with the backend (see [backend README](../backend/README.md)).
+
 # TODO
 
 - **Styling** - The styling is very basic right now
@@ -23,3 +29,4 @@ There are no extra libraries being used at this moment.
 - **Login / security** - The token is hardcoded
 - **Manual Order report** - Make it easier to report orders
 - **Refresh button for tables**
+- **Better date parsing and classes in api** - Need to avoid `new Date()`

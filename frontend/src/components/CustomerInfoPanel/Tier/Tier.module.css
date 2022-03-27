@@ -3,21 +3,6 @@
   background-color: #d9d9d9;
   padding: 0 10px;
   font-size: large;
-}
-
-.gold {
-  color: gold;
-}
-
-.silver {
-  color: silver;
-}
-
-.bronze {
-  color: saddlebrown;
-}
-
-.platinum {
-  color: powderblue;
+  text-transform: capitalize;
 }
 
